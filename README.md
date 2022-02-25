@@ -32,7 +32,7 @@ go get github.com/StarkBotsIndustries/telegraph/v2
 
 ### Documentation
 
-Docs can be found here : [![Go Reference](https://pkg.go.dev/badge/github.com/StarkBotsIndustries/telegraph.svg)](https://pkg.go.dev/github.com/StarkBotsIndustries/telegraph)
+Docs can be found here : [![Go Reference](https://pkg.go.dev/badge/github.com/StarkBotsIndustries/telegraph.svg)](https://pkg.go.dev/github.com/StarkBotsIndustries/telegraph/v2)
 
 ### Example
 
@@ -43,7 +43,7 @@ A project based on this library can be found here : [Telegraph Go Bot](https://g
 This is pretty straightforward. First, import the library
 
 ```go
-import "github.com/StarkBotsIndustries/telegraph"
+import "github.com/StarkBotsIndustries/telegraph/v2"
 ```
 
 Now you can call any methods. Let's say, **CreateAccount**?
