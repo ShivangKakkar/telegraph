@@ -1,35 +1,53 @@
 package telegraph
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"reflect"
+	"strconv"
 	"strings"
-
-	"github.com/anaskhan96/soup"
+	"unicode"
 )
 
 var baseURL string = "https://api.telegra.ph/"
 
-// type Telegraph struct{}
-
-type ResultStruct struct {
+type response struct {
 	Ok     bool          `json:"ok"`
 	Result AllValueTypes `json:"result,omitempty"`
 	Error  string        `json:"error,omitempty"`
 }
 
-func callAPI(route string, params string) (*AllValueTypes, error) {
-	var url string
-	if params == "" {
-		url = baseURL + route
-	} else {
-		url = baseURL + route + "?" + params
+func Get(route string, opts interface{}) (*AllValueTypes, error) {
+	vs := url.Values{}
+	v := reflect.ValueOf(opts)
+	t := v.Type()
+	for i := 0; i < v.NumField(); i++ {
+		val := v.Field(i).Interface()
+		key := t.Field(i).Name
+		if !isZeroOfType(val) {
+			var str string
+			switch vt := val.(type) {
+			case int64:
+				str = strconv.FormatInt(vt, 10)
+			case bool:
+				str = strconv.FormatBool(vt)
+			case []string:
+				str = fmt.Sprintf(`["%v"]`, strings.Join(vt, `","`))
+			case []Node:
+				str = NodeToQueryString(vt)
+			default:
+				str = vt.(string)
+			}
+			vs.Add(snaking(key), str)
+		}
 	}
-	var jsonData ResultStruct
-	r, e := http.Get(url)
+	u := baseURL + route + "?" + vs.Encode()
+	var jsonData response
+	r, e := http.Get(u)
 	bs, _ := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
 	if e != nil {
@@ -42,6 +60,25 @@ func callAPI(route string, params string) (*AllValueTypes, error) {
 	return &jsonData.Result, nil
 }
 
+func Post(route string, opts interface{}) (*AllValueTypes, error) {
+	u := baseURL + route
+	var jsonData response
+	bs, _ := json.Marshal(opts)
+	r, e := http.Post(u, "application/json", bytes.NewReader(bs))
+	bs, _ = ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if e != nil {
+		return &AllValueTypes{}, e
+	}
+	json.Unmarshal(bs, &jsonData)
+	if !jsonData.Ok {
+		return &AllValueTypes{}, fmt.Errorf(jsonData.Error)
+	}
+	return &jsonData.Result, nil
+}
+
+// ------------------- Helpers ------------------ //
+
 func isZeroOfType(x interface{}) bool {
 	return reflect.DeepEqual(x, reflect.Zero(reflect.TypeOf(x)).Interface())
 }
@@ -51,51 +88,12 @@ func Prettify(t interface{}) string {
 	return string(b)
 }
 
-// ToDo : Use a better, nope, much better way. But yeah, it's reliable.
-
-func HTMLToNodeString(html string) string {
-	doc := soup.HTMLParse(html)
-	children := doc.Find("body").Children()
-	my := []string{}
-	for _, c := range children {
-		str := "{"
-		tagStr := ""
-		if c.NodeValue != "" {
-			tagStr = fmt.Sprintf(`"%v"`, c.NodeValue)
+func snaking(s string) string {
+	c := s[1:]
+	for _, char := range c {
+		if unicode.IsUpper(char) {
+			c = strings.Replace(c, string(char), "_"+strings.ToLower(string(char)), -1)
 		}
-		childrenStr := ""
-		if c.Text() != "" {
-			childrenStr = fmt.Sprintf(`["%v"]`, c.Text())
-		}
-		// 	str += `"` + c.NodeValue + `"`
-		// }
-		attrsStr := ""
-		if c.Attrs() != nil {
-			attrsList := []string{}
-			for k, v := range c.Attrs() {
-				attrsList = append(attrsList, fmt.Sprintf(`"%v":"%v"`, k, v))
-			}
-			attrsStr = fmt.Sprintf(`{%v}`, strings.Join(attrsList, ","))
-		}
-		if tagStr != "" {
-			if c.Text() == "" && c.NodeValue != "img" {
-				str = fmt.Sprintf(`"%v"`, c.NodeValue)
-				my = append(my, str)
-				continue
-			} else {
-				str += fmt.Sprintf(`"tag":%v,`, tagStr)
-			}
-		}
-		if attrsStr != "" {
-			str += fmt.Sprintf(`"attrs":%v,`, attrsStr)
-		}
-		if childrenStr != "" {
-			str += fmt.Sprintf(`"children":%v,`, childrenStr)
-		}
-		str = str[0 : len(str)-1]
-		str += "}"
-		my = append(my, str)
 	}
-	str := strings.Join(my, ",")
-	return "[" + str + "]"
+	return strings.ToLower(string(s[0])) + c
 }

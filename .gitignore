@@ -1,7 +1,7 @@
 .vscode/
 .gitattributes
-
 compiler/
 __pycache__
 venv/
 .idea/
+*.txt

@@ -19,8 +19,7 @@ Here are the most important aspects, shown as pros and cons:
 
 #### Cons
 
-- Types `Node` and `NodeElement` are not implemented.
-- No custom error handling. Not much panicking. Though official errors will be returned as `Error` object. But I guess that's conventional, and maybe convenient?
+- No custom error handling. Not much panicking. Though official errors will be returned as `error` object. But I guess that's conventional, and maybe convenient?
 - The bugs you are going to find.
 
 ### Installing
@@ -28,12 +27,16 @@ Here are the most important aspects, shown as pros and cons:
 Just install it using the standard `go get` command.
 
 ```shell
-go get github.com/StarkBotsIndustries/telegraph@v1.0.0
+go get github.com/StarkBotsIndustries/telegraph@v2.0.0-beta
 ```
 
 ### Documentation
 
 Docs can be found here : [![Go Reference](https://pkg.go.dev/badge/github.com/StarkBotsIndustries/telegraph.svg)](https://pkg.go.dev/github.com/StarkBotsIndustries/telegraph)
+
+### Example
+
+A project based on this library can be found here : [Telegraph Go Bot](https://github.com/Telegraph-Go-Bot)
 
 ### Usage
 
@@ -46,7 +49,9 @@ import "github.com/StarkBotsIndustries/telegraph"
 Now you can call any methods. Let's say, **CreateAccount**?
 
 ```go
-acc, err := telegraph.CreateAccount(&telegraph.CreateAccountOpts{ShortName: "Go is Love"})
+acc, err := telegraph.CreateAccount(
+    telegraph.CreateAccountOpts{ShortName: "Go is Love"},
+)
 
 acc.AccessToken
 >>> abcdefghijklmnopqrstuvwxyz
@@ -58,11 +63,22 @@ acc.ShortName
 Or **CreatePage**
 
 ```go
-page, err := telegraph.CreatePage(&telegraph.CreatePageOpts{
-    Title: "My First Page", 
-    Content: "Hi <b>Brothers</b> and <code>Sisters</code>", 
-    AccessToken: "abcdefghijklmnopqrstuvwxyz",
-})
+	page, err := telegraph.CreatePage(telegraph.CreatePageOpts{
+		Title: "My First Page",
+		Content: []telegraph.Node{
+			"Hi ",
+			telegraph.NodeElement{
+				Tag:      "b",
+				Children: []telegraph.Node{"Brothers"},
+			},
+			" and ",
+			telegraph.NodeElement{
+				Tag:      "code",
+				Children: []telegraph.Node{"Sisters"},
+			},
+		},
+		AccessToken: "abcdefghijklmnopqrstuvwxyz",
+	})
 
 page.URL
 >>> https://telegra.ph/My-First-Page-02-20
@@ -71,10 +87,20 @@ page.Path
 >>> My-First-Page-02-20
 ```
 
+You can also directly use HTML using _HTMLContent_ field
+
+```go
+page, err := telegraph.CreatePage(telegraph.CreatePageOpts{
+    Title: "My First Page",
+    HTMLContent: "Hi <b>Brothers</b> and <code>Sisters</code>",
+    AccessToken: "abcdefghijklmnopqrstuvwxyz",
+})
+```
+
 **Pretty Print** an Object / Convert to **JSON**
 
 ```go
-acc, err := telegraph.CreateAccount(&telegraph.CreateAccountOpts{ShortName: "Go is Love"})
+acc, err := telegraph.CreateAccount(telegraph.CreateAccountOpts{ShortName: "Go is Love"})
 prettifiedObject := telegraph.Prettify(acc)
 
 prettifiedObject
@@ -97,6 +123,26 @@ link, _ := telegraph.Upload(file, "photo")
 
 link
 >>> https://telegra.ph/file/abcdefghijklmnopqrstuvwxyz.jpg
+```
+
+Raw **Get** Request
+
+```go
+opts := telegraph.CreateAccountOpts{ShortName: "Durov Uncle"}
+acc, err := telegraph.Get("createAccount", opts)
+
+acc.AccessToken
+>>> abcdefghijklmnopqrstuvwxyz
+```
+
+Raw **Post** Request
+
+```go
+opts := telegraph.CreateAccountOpts{ShortName: "Durov Uncle"}
+acc, err := telegraph.Post("createAccount", opts)
+
+acc.AccessToken
+>>> abcdefghijklmnopqrstuvwxyz
 ```
 
 ### Community and Support

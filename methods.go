@@ -1,34 +1,18 @@
 package telegraph
 
-import (
-	"net/url"
-	"strconv"
-	"strings"
-)
-
 // CreateAccountOpts is the set of fields for 'Telegraph.CreateAccount'
 type CreateAccountOpts struct {
 	// Required. Account name, helps users with several accounts remember which they are currently using. Displayed to the user above the "Edit/Publish" button on Telegra.ph, other users don't see this name.
-	ShortName string
+	ShortName string `json:"short_name"`
 	// Optional. Default author name used when creating new articles.
-	AuthorName string
+	AuthorName string `json:"author_name"`
 	// Optional. Default profile link, opened when users click on the author's name below the title. Can be any link, not necessarily to a Telegram profile or channel.
-	AuthorURL string
+	AuthorURL string `json:"author_url"`
 }
 
 // CreateAccount using Telegraph API. Returns Account object
-func CreateAccount(opts *CreateAccountOpts) (acc *Account, err error) {
-	v := url.Values{}
-	if !isZeroOfType(opts.ShortName) {
-		v.Add("short_name", opts.ShortName)
-	}
-	if !isZeroOfType(opts.AuthorName) {
-		v.Add("author_name", opts.AuthorName)
-	}
-	if !isZeroOfType(opts.AuthorURL) {
-		v.Add("author_url", opts.AuthorURL)
-	}
-	r, e := callAPI("createAccount", v.Encode())
+func CreateAccount(opts CreateAccountOpts) (acc *Account, err error) {
+	r, e := Get("createAccount", opts)
 	return &Account{
 		ShortName:   r.ShortName,
 		AuthorName:  r.AuthorName,
@@ -42,31 +26,18 @@ func CreateAccount(opts *CreateAccountOpts) (acc *Account, err error) {
 // EditAccountInfoOpts is the set of fields for 'Telegraph.EditAccountInfo'
 type EditAccountInfoOpts struct {
 	// Required. Access token of the Telegraph account.
-	AccessToken string
+	AccessToken string `json:"access_token"`
 	// Optional. New account name.
-	ShortName string
+	ShortName string `json:"short_name"`
 	// Optional. New default author name used when creating new articles.
-	AuthorName string
+	AuthorName string `json:"author_name"`
 	// Optional. New default profile link, opened when users click on the author's name below the title. Can be any link, not necessarily to a Telegram profile or channel.
-	AuthorURL string
+	AuthorURL string `json:"author_url"`
 }
 
 // EditAccountInfo using Telegraph API. Returns Account object
-func EditAccountInfo(opts *EditAccountInfoOpts) (acc *Account, err error) {
-	v := url.Values{}
-	if !isZeroOfType(opts.AccessToken) {
-		v.Add("access_token", opts.AccessToken)
-	}
-	if !isZeroOfType(opts.ShortName) {
-		v.Add("short_name", opts.ShortName)
-	}
-	if !isZeroOfType(opts.AuthorName) {
-		v.Add("author_name", opts.AuthorName)
-	}
-	if !isZeroOfType(opts.AuthorURL) {
-		v.Add("author_url", opts.AuthorURL)
-	}
-	r, e := callAPI("editAccountInfo", v.Encode())
+func EditAccountInfo(opts EditAccountInfoOpts) (acc *Account, err error) {
+	r, e := Get("editAccountInfo", opts)
 	return &Account{
 		ShortName:   r.ShortName,
 		AuthorName:  r.AuthorName,
@@ -80,21 +51,14 @@ func EditAccountInfo(opts *EditAccountInfoOpts) (acc *Account, err error) {
 // GetAccountInfoOpts is the set of fields for 'Telegraph.GetAccountInfo'
 type GetAccountInfoOpts struct {
 	// Required. Access token of the Telegraph account.
-	AccessToken string
+	AccessToken string `json:"access_token"`
 	// Optional. List of account fields to return. Available fields: short_name, author_name, author_url, auth_url, page_count.
-	Fields []string
+	Fields []string `json:"fields"`
 }
 
 // GetAccountInfo using Telegraph API. Returns Account object
-func GetAccountInfo(opts *GetAccountInfoOpts) (acc *Account, err error) {
-	v := url.Values{}
-	if !isZeroOfType(opts.AccessToken) {
-		v.Add("access_token", opts.AccessToken)
-	}
-	if !isZeroOfType(opts.Fields) {
-		v.Add("fields", strings.Join(opts.Fields, ","))
-	}
-	r, e := callAPI("getAccountInfo", v.Encode())
+func GetAccountInfo(opts GetAccountInfoOpts) (acc *Account, err error) {
+	r, e := Get("getAccountInfo", opts)
 	return &Account{
 		ShortName:   r.ShortName,
 		AuthorName:  r.AuthorName,
@@ -108,16 +72,12 @@ func GetAccountInfo(opts *GetAccountInfoOpts) (acc *Account, err error) {
 // RevokeAccessTokenOpts is the set of fields for 'Telegraph.RevokeAccessToken'
 type RevokeAccessTokenOpts struct {
 	// Required. Access token of the Telegraph account.
-	AccessToken string
+	AccessToken string `json:"access_token"`
 }
 
 // RevokeAccessToken using Telegraph API. Returns Account object
-func RevokeAccessToken(opts *RevokeAccessTokenOpts) (acc *Account, err error) {
-	v := url.Values{}
-	if !isZeroOfType(opts.AccessToken) {
-		v.Add("access_token", opts.AccessToken)
-	}
-	r, e := callAPI("revokeAccessToken", v.Encode())
+func RevokeAccessToken(opts RevokeAccessTokenOpts) (acc *Account, err error) {
+	r, e := Get("revokeAccessToken", opts)
 	return &Account{
 		ShortName:   r.ShortName,
 		AuthorName:  r.AuthorName,
@@ -131,41 +91,28 @@ func RevokeAccessToken(opts *RevokeAccessTokenOpts) (acc *Account, err error) {
 // CreatePageOpts is the set of fields for 'Telegraph.CreatePage'
 type CreatePageOpts struct {
 	// Required. Access token of the Telegraph account.
-	AccessToken string
+	AccessToken string `json:"access_token"`
 	// Required. Page title.
-	Title string
+	Title string `json:"title"`
 	// Optional. Author name, displayed below the article's title.
-	AuthorName string
+	AuthorName string `json:"author_name"`
 	// Optional. Profile link, opened when users click on the author's name below the title. Can be any link, not necessarily to a Telegram profile or channel.
-	AuthorURL string
+	AuthorURL string `json:"author_url"`
+	// Required if Content is empty. Content of the page as HTML string.
+	HTMLContent string `json:"html_content"`
 	// Required. Content of the page.
-	Content string
-	// Optional. If true, a content field will be returned in the Page object (see: Content format).
-	ReturnContent bool
+	Content []Node `json:"content"`
+	// Optional. If true, a content field will be returned in the Page object
+	ReturnContent bool `json:"return_content"`
 }
 
 // CreatePage using Telegraph API. Returns Page object
-func CreatePage(opts *CreatePageOpts) (page *Page, err error) {
-	v := url.Values{}
-	if !isZeroOfType(opts.AccessToken) {
-		v.Add("access_token", opts.AccessToken)
+func CreatePage(opts CreatePageOpts) (page *Page, err error) {
+	if opts.Content == nil && opts.HTMLContent != "" {
+		opts.Content = HTMLToNode(opts.HTMLContent)
+		opts.HTMLContent = ""
 	}
-	if !isZeroOfType(opts.Title) {
-		v.Add("title", opts.Title)
-	}
-	if !isZeroOfType(opts.AuthorName) {
-		v.Add("author_name", opts.AuthorName)
-	}
-	if !isZeroOfType(opts.AuthorURL) {
-		v.Add("author_url", opts.AuthorURL)
-	}
-	if !isZeroOfType(opts.Content) {
-		v.Add("content", HTMLToNodeString(opts.Content))
-	}
-	if !isZeroOfType(opts.ReturnContent) {
-		v.Add("return_content", strconv.FormatBool(opts.ReturnContent))
-	}
-	r, e := callAPI("createPage", v.Encode())
+	r, e := Post("createPage", opts) // Post request instead of Get
 	return &Page{
 		Path:        r.Path,
 		URL:         r.URL,
@@ -183,46 +130,30 @@ func CreatePage(opts *CreatePageOpts) (page *Page, err error) {
 // EditPageOpts is the set of fields for 'Telegraph.EditPage'
 type EditPageOpts struct {
 	// Required. Access token of the Telegraph account.
-	AccessToken string
+	AccessToken string `json:"access_token"`
 	// Required. Path to the page.
-	Path string
+	Path string `json:"path"`
 	// Required. Page title.
-	Title string
-	// Required. Content of the page.
-	Content string
+	Title string `json:"title"`
+	// Required if Content is empty. Content of the page as HTML string.
+	HTMLContent string `json:"html_content"`
+	// Required if HTMLContent is empty. Content of the page.
+	Content []Node `json:"content"`
 	// Optional. Author name, displayed below the article's title.
-	AuthorName string
+	AuthorName string `json:"author_name"`
 	// Optional. Profile link, opened when users click on the author's name below the title. Can be any link, not necessarily to a Telegram profile or channel.
-	AuthorURL string
-	// Optional. If�true, a content field will be returned in the Page object.
-	ReturnContent bool
+	AuthorURL string `json:"author_url"`
+	// Optional. If true, a content field will be returned in the Page object.
+	ReturnContent bool `json:"return_content"`
 }
 
 // EditPage using Telegraph API. Returns Page object
-func EditPage(opts *EditPageOpts) (page *Page, err error) {
-	v := url.Values{}
-	if !isZeroOfType(opts.AccessToken) {
-		v.Add("access_token", opts.AccessToken)
+func EditPage(opts EditPageOpts) (page *Page, err error) {
+	if opts.Content == nil && opts.HTMLContent != "" {
+		opts.Content = HTMLToNode(opts.HTMLContent)
+		opts.HTMLContent = ""
 	}
-	if !isZeroOfType(opts.Path) {
-		v.Add("path", opts.Path)
-	}
-	if !isZeroOfType(opts.Title) {
-		v.Add("title", opts.Title)
-	}
-	if !isZeroOfType(opts.Content) {
-		v.Add("content", HTMLToNodeString(opts.Content))
-	}
-	if !isZeroOfType(opts.AuthorName) {
-		v.Add("author_name", opts.AuthorName)
-	}
-	if !isZeroOfType(opts.AuthorURL) {
-		v.Add("author_url", opts.AuthorURL)
-	}
-	if !isZeroOfType(opts.ReturnContent) {
-		v.Add("return_content", strconv.FormatBool(opts.ReturnContent))
-	}
-	r, e := callAPI("editPage", v.Encode())
+	r, e := Post("editPage", opts) // Post request instead of Get
 	return &Page{
 		Path:        r.Path,
 		URL:         r.URL,
@@ -240,21 +171,14 @@ func EditPage(opts *EditPageOpts) (page *Page, err error) {
 // GetPageOpts is the set of fields for 'Telegraph.GetPage'
 type GetPageOpts struct {
 	// Required. Path to the Telegraph page (in the format Title-12-31, i.e. everything that comes after http://telegra.ph/).
-	Path string
-	// Optional. If�true, content field will be returned in Page object.
-	ReturnContent bool
+	Path string `json:"path"`
+	// Optional. If true, content field will be returned in Page object.
+	ReturnContent bool `json:"return_content"`
 }
 
 // GetPage using Telegraph API. Returns Page object
-func GetPage(opts *GetPageOpts) (page *Page, err error) {
-	v := url.Values{}
-	if !isZeroOfType(opts.Path) {
-		v.Add("path", opts.Path)
-	}
-	if !isZeroOfType(opts.ReturnContent) {
-		v.Add("return_content", strconv.FormatBool(opts.ReturnContent))
-	}
-	r, e := callAPI("getPage", v.Encode())
+func GetPage(opts GetPageOpts) (page *Page, err error) {
+	r, e := Get("getPage", opts)
 	return &Page{
 		Path:        r.Path,
 		URL:         r.URL,
@@ -272,26 +196,16 @@ func GetPage(opts *GetPageOpts) (page *Page, err error) {
 // GetPageListOpts is the set of fields for 'Telegraph.GetPageList'
 type GetPageListOpts struct {
 	// Required. Access token of the Telegraph account.
-	AccessToken string
+	AccessToken string `json:"access_token"`
 	// Optional. Sequential number of the first page to be returned.
-	Offset int64
+	Offset int64 `json:"offset"`
 	// Optional. Limits the number of pages to be retrieved.
-	Limit int64
+	Limit int64 `json:"limit"`
 }
 
 // GetPageList using Telegraph API. Returns PageList object
-func GetPageList(opts *GetPageListOpts) (pl *PageList, err error) {
-	v := url.Values{}
-	if !isZeroOfType(opts.AccessToken) {
-		v.Add("access_token", opts.AccessToken)
-	}
-	if !isZeroOfType(opts.Offset) {
-		v.Add("offset", strconv.FormatInt(opts.Offset, 10))
-	}
-	if !isZeroOfType(opts.Limit) {
-		v.Add("limit", strconv.FormatInt(opts.Limit, 10))
-	}
-	r, e := callAPI("getPageList", v.Encode())
+func GetPageList(opts GetPageListOpts) (pl *PageList, err error) {
+	r, e := Get("getPageList", opts)
 	return &PageList{
 		TotalCount: r.TotalCount,
 		Pages:      r.Pages,
@@ -301,36 +215,20 @@ func GetPageList(opts *GetPageListOpts) (pl *PageList, err error) {
 // GetViewsOpts is the set of fields for 'Telegraph.GetViews'
 type GetViewsOpts struct {
 	// Required. Path to the Telegraph page (in the format Title-12-31, where 12 is the month and 31 the day the article was first published).
-	Path string
+	Path string `json:"path"`
 	// Required if month is passed. If passed, the number of page views for the requested year will be returned.
-	Year int64
+	Year int64 `json:"year"`
 	// Required if day is passed. If passed, the number of page views for the requested month will be returned.
-	Month int64
+	Month int64 `json:"month"`
 	// Required if hour is passed. If passed, the number of page views for the requested day will be returned.
-	Day int64
+	Day int64 `json:"day"`
 	// Optional. If passed, the number of page views for the requested hour will be returned.
-	Hour int64
+	Hour int64 `json:"hour"`
 }
 
 // GetViews using Telegraph API. Returns PageViews object
-func GetViews(opts *GetViewsOpts) (views *PageViews, err error) {
-	v := url.Values{}
-	if !isZeroOfType(opts.Path) {
-		v.Add("path", opts.Path)
-	}
-	if !isZeroOfType(opts.Year) {
-		v.Add("year", strconv.FormatInt(opts.Year, 10))
-	}
-	if !isZeroOfType(opts.Month) {
-		v.Add("month", strconv.FormatInt(opts.Month, 10))
-	}
-	if !isZeroOfType(opts.Day) {
-		v.Add("day", strconv.FormatInt(opts.Day, 10))
-	}
-	if !isZeroOfType(opts.Hour) {
-		v.Add("hour", strconv.FormatInt(opts.Hour, 10))
-	}
-	r, e := callAPI("getViews", v.Encode())
+func GetViews(opts GetViewsOpts) (views *PageViews, err error) {
+	r, e := Get("getViews", opts)
 	return &PageViews{
 		Views: r.Views,
 	}, e

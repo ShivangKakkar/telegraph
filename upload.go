@@ -14,15 +14,15 @@ import (
 
 var baseUploadURL = "https://telegra.ph/upload"
 
-type UploadResult struct {
-	Source []Source
+type uploadResult struct {
+	Source []source
 }
 
-type Source struct {
+type source struct {
 	Src string `json:"src"`
 }
 
-type Error struct {
+type errorUpload struct {
 	Error string `json:"error"`
 }
 
@@ -58,10 +58,10 @@ func Upload(f io.Reader, mediaType string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	var jsonData UploadResult
+	var jsonData uploadResult
 	json.Unmarshal(content, &jsonData.Source)
 	if jsonData.Source == nil {
-		var err Error
+		var err errorUpload
 		json.Unmarshal(content, &err)
 		return "", fmt.Errorf(err.Error)
 	}
