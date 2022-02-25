@@ -27,7 +27,7 @@ Here are the most important aspects, shown as pros and cons:
 Just install it using the standard `go get` command.
 
 ```shell
-go get github.com/StarkBotsIndustries/telegraph@v2.0.0-beta
+go get github.com/StarkBotsIndustries/telegraph/v2
 ```
 
 ### Documentation
