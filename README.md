@@ -36,7 +36,7 @@ Docs can be found here : [![Go Reference](https://pkg.go.dev/badge/github.com/St
 
 ### Example
 
-A project based on this library can be found here : [Telegraph Go Bot](https://github.com/Telegraph-Go-Bot)
+A project based on this library can be found here : [Telegraph Go Bot](https://github.com/StarkBotsIndustries/Telegraph-Go-Bot)
 
 ### Usage
 
@@ -54,10 +54,10 @@ acc, err := telegraph.CreateAccount(
 )
 
 acc.AccessToken
->>> abcdefghijklmnopqrstuvwxyz
+>>> "abcdefghijklmnopqrstuvwxyz"
 
 acc.ShortName
->>> Go is Love
+>>> "Go is Love"
 ```
 
 Or **CreatePage**
@@ -81,10 +81,10 @@ Or **CreatePage**
 	})
 
 page.URL
->>> https://telegra.ph/My-First-Page-02-20
+>>> "https://telegra.ph/My-First-Page-02-20"
 
 page.Path
->>> My-First-Page-02-20
+>>> "My-First-Page-02-20"
 ```
 
 You can also directly use HTML using _HTMLContent_ field
@@ -122,7 +122,7 @@ file, _ := os.Open("file.jpg")
 link, _ := telegraph.Upload(file, "photo")
 
 link
->>> https://telegra.ph/file/abcdefghijklmnopqrstuvwxyz.jpg
+>>> "https://telegra.ph/file/abcdefghijklmnopqrstuvwxyz.jpg"
 ```
 
 Raw **Get** Request
@@ -132,7 +132,7 @@ opts := telegraph.CreateAccountOpts{ShortName: "Durov Uncle"}
 acc, err := telegraph.Get("createAccount", opts)
 
 acc.AccessToken
->>> abcdefghijklmnopqrstuvwxyz
+>>> "abcdefghijklmnopqrstuvwxyz"
 ```
 
 Raw **Post** Request
@@ -142,7 +142,7 @@ opts := telegraph.CreateAccountOpts{ShortName: "Durov Uncle"}
 acc, err := telegraph.Post("createAccount", opts)
 
 acc.AccessToken
->>> abcdefghijklmnopqrstuvwxyz
+>>> "abcdefghijklmnopqrstuvwxyz"
 ```
 
 ### Community and Support
@@ -156,3 +156,11 @@ Telegram Chat - [StarkBotsChat](https://t.me/StarkBotsChat)
 - Copyright (C) 2022 **Stark Bots** <<https://github.com/StarkBotsIndustries>>
 
 - Licensed under the terms of [GNU General Public License v3 or later (GPLv3+)](https://github.com/StarkBotsIndustries/telegraph/blob/master/LICENSE)
+
+### :)
+
+[![ForTheBadge made-with-go](http://ForTheBadge.com/images/badges/made-with-go.svg)](https://go.dev/)
+
+[![ForTheBadge built-with-love](http://ForTheBadge.com/images/badges/built-with-love.svg)](https://github.com/StarkBotsIndustries)
+
+[![ForTheBadge makes-people-smile](http://ForTheBadge.com/images/badges/makes-people-smile.svg)](https://github.com/StarkBotsIndustries)
