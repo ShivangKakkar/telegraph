@@ -1,7 +1,10 @@
 .vscode/
 .gitattributes
+*.txt
+*.sh
+*.bat
+
 compiler/
 __pycache__
 venv/
 .idea/
-*.txt

@@ -88,7 +88,9 @@ func Prettify(t interface{}) string {
 	return string(b)
 }
 
+// This is specific for these cases and can't be used in general
 func snaking(s string) string {
+	s = strings.ReplaceAll(s, "URL", "_url") // Exceptional
 	c := s[1:]
 	for _, char := range c {
 		if unicode.IsUpper(char) {
