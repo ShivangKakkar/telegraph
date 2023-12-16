@@ -1,4 +1,4 @@
-module github.com/StarkBotsIndustries/telegraph/v2
+module github.com/thehellruler/telegraph/v2
 
 go 1.17
 
