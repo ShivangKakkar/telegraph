@@ -12,7 +12,7 @@ import (
 	"net/http"
 )
 
-var baseUploadURL = "https://telegra.ph/upload"
+var baseUploadURL = "https://graph.org/upload"
 
 type uploadResult struct {
 	Source []source
