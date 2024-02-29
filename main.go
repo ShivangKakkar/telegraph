@@ -13,7 +13,7 @@ import (
 	"unicode"
 )
 
-var baseURL string = "https://api.telegra.ph/"
+var baseURL string = "https://api.graph.org/"
 
 type response struct {
 	Ok     bool          `json:"ok"`
